@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urn:extension xmlns:urn="newrelic-extension"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="newrelic-extension extension.xsd " name="customExtension">
+	<urn:instrumentation>
+		<urn:pointcut transactionStartPoint="true">
+			<urn:className>com.nr.test.servlet.CustomTestServlet</urn:className>
+			<urn:method>
+				<urn:name>customTestMethod</urn:name>
+				<urn:parameters>
+					<urn:type>javax.servlet.http.HttpServletRequest</urn:type>
+				</urn:parameters>
+			</urn:method>
+		</urn:pointcut>
+                <urn:pointcut transactionStartPoint="false" ignoreTransaction="false" excludeFromTransactionTrace="false"  metricNameFormat="CUSTOM/metricOtherMethod">
+                        <urn:className>com.nr.test.servlet.CustomTestServlet</urn:className>
+                        <urn:method>
+                                <urn:name>customOtherTestMethod</urn:name>
+                                <urn:parameters>
+                                        <urn:type>javax.servlet.http.HttpServletRequest</urn:type>
+                                </urn:parameters>
+                        </urn:method>
+                </urn:pointcut>
+	</urn:instrumentation>
+</urn:extension>

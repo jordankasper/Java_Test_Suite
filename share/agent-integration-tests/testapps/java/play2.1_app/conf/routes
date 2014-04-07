@@ -1,0 +1,15 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /scala                           controllers.ScalaApplication.index
+GET     /scala-async                     controllers.AsyncScalaApplication.index
+GET     /java                            controllers.JavaApplication.index()
+GET     /java-async                      controllers.AsyncJavaApplication.index()
+GET     /hello-java                      controllers.JavaApplication.hello()
+GET     /hello-scala                     controllers.ScalaApplication.hello
+GET     /scala-timeout                   controllers.ScalaApplication.timeout
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

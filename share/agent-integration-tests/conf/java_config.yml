@@ -1,0 +1,528 @@
+defaults:
+  - &java_defaults
+    archive_repo: $(repo_host)/app/java/$(os)
+    bindir:       bin
+    default:      true
+
+  - &jboss_defaults
+    archive_repo:  $(repo_host)/app/jboss
+    host:          localhost
+    port:          8080
+    bindir:        bin
+#    shutdown_args: [ shutdown.sh, -S ]
+    log_file:      server.log
+    shutdown_log_file: boot.log
+    jvm_args:      [ '-XX:MaxPermSize=512m', '-Xmx1024m' ]
+
+  - &wildfly_defaults
+    archive_repo:  $(repo_host)/app/wildfly
+    host:          localhost
+    port:          8080
+    bindir:        bin
+    startup_args:  [ standalone.sh ]
+    shutdown_args: [ jboss-cli.sh, --connect, "--command=:shutdown" ]
+    deploy_path:   standalone/deployments
+    log_file:      server.log
+    log_path:      standalone/log
+    startup_msg:   ' started in'
+    shutdown_msg:  ' stopped in'
+    jvm_args:      [ '-XX:MaxPermSize=512m', '-Xmx1024m' ]
+
+  - &jetty_defaults
+    archive_repo:  $(repo_host)/app/jetty
+    host:          localhost
+    port:          8080
+    bindir:        bin
+    startup_args:  [ jetty.sh, start ]
+    shutdown_args: [ jetty.sh, stop ]
+    log_file:      stderrout.log
+    log_path:      logs
+    startup_msg:   'Started SelectChannelConnector'
+#    jvm_args:      [ -Dnewrelic.config.log_level=finest, -Xmx1024m ]
+
+  - &tomcat_defaults
+    archive_repo:  $(repo_host)/app/tomcat
+    host:          localhost
+    port:          8080
+    bindir:        bin
+    startup_args:  [ startup.sh ]
+# if Tomcat does not shutdown after 30 seconds kill the process
+    shutdown_args: [ catalina.sh, stop, '30', -force ]
+    log_file:      catalina.out
+    log_path:      logs
+    delete_dir:    work/Catalina
+    startup_msg:   'Server startup in'
+    jvm_args:      ['-Xmx1024m']
+#    jvm_args:      [ -Dnewrelic.config.log_level=finest ]
+
+  - &tomee_defaults
+    archive_repo:  $(repo_host)/app/tomee
+    <<:      *tomcat_defaults
+
+  - &play_defaults
+    archive_repo:  $(repo_host)/app/play
+    host:          localhost
+    port:          9000
+    startup_args:  [ play, start ]
+    shutdown_args: [ play, stop ]
+    default_app:   samples-and-tests/forum
+    pid_file:      $(app_root)/play-1.2.5/samples-and-tests/forum/server.pid,$(app_root)/play-1.2.5/samples-and-tests/asynctest/server.pid
+
+  - &play2_defaults
+    archive_repo:  $(repo_host)/app/play2
+    bindir:        dist-out
+    host:          localhost
+    port:          9000
+    startup_args:  [ start ]
+    default_app_name: helloworld
+    default_app_lang: scala
+    default_app:   samples/scala/helloworld
+
+  - &play2_app_defaults
+    archive_repo:  $(repo_host)/app/play2
+    bindir:        .
+    host:          localhost
+    port:          9000
+    startup_args:  [ start ]
+
+  - &resin_defaults
+    archive_repo:  $(repo_host)/app/resin
+    host:          localhost
+    port:          8080
+    bindir:        bin
+    log_file:      jvm-app-0.log
+    log_path:      log
+    startup_msg:   'Resin[id=app-0] started in'
+
+  - &glassfish_defaults
+    archive_repo:  $(repo_host)/app/glassfish
+    host:          localhost
+    port:          8080
+    bindir:        bin
+    startup_args:  [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, start-domain ]
+    shutdown_args: [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, stop-domain ]
+    deploy_args:   [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, deploy ]
+    undeploy_args: [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, undeploy ]
+    list_domains_args: [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, list-domains ]
+    list_applications_args: [ asadmin, --user=admin, --passwordfile=$(test_apps_root)/../conf/glassfish_passwords.txt, list-applications ]
+#    jvm_args:      ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=7001', -Xnoagent']
+
+config:
+  java:
+    - version: 5
+      archive: jdk1.5.0_22.tgz
+      path:    $(app_root)/jdk1.5.0_22
+      default: false
+      <<:      *java_defaults
+
+    - version: 6
+      archive: jdk1.6.0_31.tgz
+      path:    $(app_root)/jdk1.6.0_31
+      <<:      *java_defaults
+
+    - version: 7
+      archive: jdk1.7.0_51.tgz
+      path:    $(app_root)/jdk1.7.0_51
+      <<:      *java_defaults
+
+  jetty:
+    - version: 6.1
+      archive: jetty-6.1.26.tar.gz
+      path:    $(app_root)/jetty-6.1.26
+      <<:      *jetty_defaults
+
+    - version: 7.0
+      archive: jetty-hightide-7.0.2.v20100331.tar.gz
+      path:    $(app_root)/jetty-hightide-7.0.2.v20100331
+      <<:      *jetty_defaults
+
+    - version: 7.1
+      archive: jetty-hightide-7.1.6.v20100715.tar.gz
+      path:    $(app_root)/jetty-hightide-7.1.6.v20100715
+      <<:      *jetty_defaults
+
+    - version: 7.2
+      archive: jetty-hightide-7.2.2.v20101205.tar.gz
+      path:    $(app_root)/jetty-hightide-7.2.2.v20101205
+      <<:      *jetty_defaults
+
+    - version: 7.3
+      archive: jetty-hightide-7.3.1.v20110307.tar.gz
+      path:    $(app_root)/jetty-hightide-7.3.1.v20110307
+      <<:      *jetty_defaults
+
+    - version: 7.4
+      archive: jetty-hightide-7.4.5.v20110725.tar.gz
+      path:    $(app_root)/jetty-hightide-7.4.5.v20110725
+      <<:      *jetty_defaults
+
+    - version: 7.5
+      archive: jetty-hightide-7.5.4.v20111024.tar.gz
+      path:    $(app_root)/jetty-hightide-7.5.4.v20111024
+      <<:      *jetty_defaults
+
+    - version: 7.6
+      archive: jetty-hightide-7.6.4.v20120524.tar.gz
+      path:    $(app_root)/jetty-hightide-7.6.4.v20120524
+      <<:      *jetty_defaults
+
+    - version: 8.0
+      archive: jetty-hightide-8.0.4.v20111024.tar.gz
+      path:    $(app_root)/jetty-hightide-8.0.4.v20111024
+      <<:      *jetty_defaults
+
+    - version: 8.1
+      archive: jetty-hightide-8.1.4.v20120524.tar.gz
+      path:    $(app_root)/jetty-hightide-8.1.4.v20120524
+      <<:      *jetty_defaults
+
+    - version: 9.01
+      archive: jetty-distribution-9.0.1.v20130408.tar.gz
+      path:    $(app_root)/jetty-distribution-9.0.1.v20130408
+      <<:      *jetty_defaults
+
+    - version: 9.03
+      archive: jetty-distribution-9.0.3.v20130506.tar.gz
+      path:    $(app_root)/jetty-distribution-9.0.3.v20130506
+      startup_msg: 'Started ServerConnector'
+      <<:      *jetty_defaults
+
+    - version: 9.11
+      archive: jetty-distribution-9.1.1.v20140108.tar.gz
+      path:    $(app_root)/jetty-distribution-9.1.1.v20140108
+      startup_msg: 'Started ServerConnector'
+      <<:      *jetty_defaults
+
+  tomcat:
+    - version: 5.5
+      archive: apache-tomcat-5.5.35.tar.gz
+      path:    $(app_root)/apache-tomcat-5.5.35
+      <<:      *tomcat_defaults
+
+    - version: 6.0
+      archive: apache-tomcat-6.0.35.tar.gz
+      path:    $(app_root)/apache-tomcat-6.0.35
+      <<:      *tomcat_defaults
+
+    - version: 7.0
+      archive: apache-tomcat-7.0.28.tar.gz
+      path:    $(app_root)/apache-tomcat-7.0.28
+      <<:      *tomcat_defaults
+
+# In the tomee distro, the archive name and path names differ
+  tomee:
+    - version: 1.5
+      archive: apache-tomee-1.5.0-plus.tar.gz
+      path:    $(app_root)/apache-tomee-plus-1.5.0
+      <<:      *tomee_defaults
+
+  jboss:
+    - version:       6.1
+      archive:       jboss-6.1.0.Final.tar.gz
+      path:          $(app_root)/jboss-6.1.0.Final
+      log_path:      server/default/log
+      deploy_path:   server/default/deploy
+      startup_args:  [ run.sh ]
+      shutdown_args: [ shutdown.sh, -S, --host=localhost, "--server=service:jmx:rmi:///jndi/rmi://localhost:1090/jmxrmi", --port=1090env ]
+      startup_msg:   'Started in'
+      shutdown_msg:  'Stopped:'
+      <<:            *jboss_defaults
+
+    - version:       7.1
+      archive:       jboss-as-7.1.1.Final.tar.gz
+      path:          $(app_root)/jboss-as-7.1.1.Final
+      log_path:      standalone/log
+      deploy_path:   standalone/deployments
+      startup_args:  [ standalone.sh ]
+      shutdown_args: [ jboss-cli.sh, --connect, "--command=:shutdown" ]
+      startup_msg:   'started in'
+      shutdown_msg:  'stopped in'
+      <<:            *jboss_defaults
+ 
+  wildfly:
+    - version:       8.0.0.Final
+      archive:       wildfly-8.0.0.Final.tar.gz
+      path:          $(app_root)/wildfly-8.0.0.Final
+      <<:            *wildfly_defaults
+
+  glassfish:
+    - version:     3.1
+      archive:     glassfish-3.1.tar.gz
+      path:        $(app_root)/glassfish-3.1
+      config_path: $(app_root)/glassfish-3.1/glassfish/domains/domain1/config/domain.xml
+      java_conf_path: $(app_root)/glassfish-3.1/glassfish/config/asenv.conf
+      <<:          *glassfish_defaults
+
+    - version:     4.0
+      archive:     glassfish-4.0.tar.gz
+      path:        $(app_root)/glassfish4
+      config_path: $(app_root)/glassfish4/glassfish/domains/domain1/config/domain.xml
+      java_conf_path: $(app_root)/glassfish4/glassfish/config/asenv.conf
+      <<:          *glassfish_defaults
+      startup_args:  [ asadmin, start-domain ]
+      shutdown_args: [ asadmin, stop-domain ]
+      deploy_args:   [ asadmin, deploy ]
+      undeploy_args: [ asadmin, undeploy ]
+      list_domains_args: [ asadmin, list-domains ]
+      list_applications_args: [ asadmin, list-applications ]
+
+  play:
+    - version:     1.2
+      archive:     play-1.2.5.tar.gz
+      path:        $(app_root)/play-1.2.5
+      <<:          *play_defaults
+
+  play2:
+    - version:     2.0.8
+      archive:     play-2.0.8.tar.gz
+      path:        $(app_root)/play-2.0.8
+      <<:          *play2_defaults
+      bindir:      .
+      startup_args:  [ start, -DapplyEvolutions.default=true ]
+
+    - version:     2.0.8-java
+      archive:     play-2.0.8.tar.gz
+      path:        $(app_root)/play-2.0.8
+      <<:          *play2_defaults
+      bindir:      .
+      startup_args:  [ start, -DapplyEvolutions.default=true ]
+      default_app_lang: java
+      default_app:   samples/java/helloworld
+
+    - version:     2.1.5
+      archive:     play-2.1.5.tar.gz
+      path:        $(app_root)/play-2.1.5
+      <<:          *play2_defaults
+      bindir:      .
+      startup_args:  [ start, -DapplyEvolutions.default=true ]
+
+    - version:     2.1.5-java
+      archive:     play-2.1.5.tar.gz
+      path:        $(app_root)/play-2.1.5
+      <<:          *play2_defaults
+      bindir:      .
+      startup_args:  [ start, -DapplyEvolutions.default=true ]
+      default_app_lang: java
+      default_app:   samples/java/helloworld
+
+    - version:     2.2.0
+      archive:     play-2.2.0.tar.gz
+      path:        $(app_root)/play-2.2.0
+      <<:          *play2_defaults
+      bindir:      bin
+      startup_args:  [ helloworld, -DapplyEvolutions.default=true ]
+
+    - version:     2.2.0-java
+      archive:     play-2.2.0.tar.gz
+      path:        $(app_root)/play-2.2.0
+      <<:          *play2_defaults
+      bindir:      bin
+      startup_args:  [ helloworld, -DapplyEvolutions.default=true ]
+      default_app_lang: java
+      default_app:   samples/java/helloworld
+
+  # Play2_app: based off the apps in the testapps dir using the output of `play dist`
+  play2_app:
+    - version:     2.0.8
+      archive:     play2.0.8_app.tar.gz
+      path:        $(app_root)/play2.0.8_app
+      <<:          *play2_app_defaults
+
+    - version:     2.1.5
+      archive:     play2.1.5_app.tar.gz
+      path:        $(app_root)/play2.1.5_app
+      <<:          *play2_app_defaults
+
+    - version:     2.2.0
+      archive:     play2.2.0_app.tar.gz
+      path:        $(app_root)/play2.2.0_app
+      <<:          *play2_app_defaults
+      bindir:      universal/stage/bin
+      startup_args:  [ play2_2_app ]
+
+  resin:
+    - version:             3.1
+      archive:             resin-3.1.12.tar.gz
+      path:                $(app_root)/resin-3.1.12
+      config_file:         resin.conf
+      jvm_arg_parent_node: server-default
+      log_file:            jvm-default.log
+      startup_msg:         'Resin started in'
+      <<:                  *resin_defaults
+      startup_args:        [ httpd.sh, start ]
+      shutdown_args:       [ httpd.sh, stop  ]
+
+    - version:             4.0
+      archive:             resin-4.0.27.tar.gz
+      path:                $(app_root)/resin-4.0.27
+      config_file:         resin.xml
+      jvm_arg_parent_node: server-multi
+      <<:                  *resin_defaults
+      startup_args:        [ resin.sh, start ]
+      shutdown_args:       [ resin.sh, stop  ]
+
+  metric_servlet:
+    - version:              SleepFourthSec
+      name:                 SleepFourthSecServlet
+      iter_count:           20
+      method_count:         25
+      repeat_count:         2
+      report_type:          FILE
+      summary:              True
+
+    - version:              OneMethodInstrumented
+      name:                 OneMethodInstrumentedServlet
+      iter_count:           10000
+      method_count:         200000
+      repeat_count:         3
+      report_type:          FILE
+      summary:              True
+
+    - version:              TwoMethodsInstrumented
+      name:                 TwoMethodsInstrumentedServlet
+      iter_count:           10000
+      method_count:         200000
+      repeat_count:         3
+      report_type:          FILE
+      summary:              True
+
+    - version:              OneThread
+      name:                 OneThreadServlet
+      iter_count:           10000
+      method_count:         20000
+      repeat_count:         3
+      report_type:          FILE
+      summary:              True
+
+    - version:              Future
+      name:                 FutureServlet
+      iter_count:           10000
+      method_count:         30000
+      repeat_count:         3
+      report_type:          FILE
+      summary:              True
+
+    - version:              MultipleThreads
+      name:                 MultipleThreadsServlet
+      iter_count:           100
+      method_count:         200
+      repeat_count:         3
+      report_type:          FILE
+      summary:              True
+
+  java_agent:
+    - version:              master
+      default:              true
+      archive:              java_agent-master.tar.gz
+      archive_repo:         $(repo_host)/app/java_agent
+      path:                 $(app_root)/java_agent-master
+      config_template_path: $(agent_integration_test_root)/conf/java/newrelic.yml
+      jar_path:             $(agent_integration_test_root)/../newrelic-agent/build/libs/newrelic.jar
+      ext_path:             $(agent_integration_test_root)/conf/java/extension/custom_ext.xml
+      metric_path:          $(agent_integration_test_root)/conf/java/extension/metric_ext.xml
+
+  extension:
+    - version:              master
+      default:              true
+      archive:              extension-master.tar.gz
+      archive_repo:         $(repo_host)/app/extension
+      path:                 $(app_root)/extension/
+
+  instrumentation_assert:
+    - version:      master
+      names:        [ hibernate-3.3, hibernate-3.5, hibernate-4.0, hibernate-4.2, spring-aop-2, servlet-2.4, servlet-3, websphere, jersey-2, javax.xml, grails-1.3, grails-2, jms-1.1, spring-jms-2 ]
+
+  java_test_webapp:
+    - version:      master
+      default:      true
+      path:         $(test_apps_root)/java/java_test_webapp
+      war_path:     $(test_apps_root)/java/java_test_webapp/target/java_test_webapp.war
+
+  spring_mvc_showcase:
+    - version:      master
+      default:      true
+      archive:      spring-mvc-showcase-master.tar.gz
+      archive_repo: $(repo_host)/app/spring-mvc-showcase
+      path:         $(app_root)/spring-mvc-showcase-master
+      war_path:     $(app_root)/spring-mvc-showcase-master/spring-mvc-showcase.war
+
+  spring_petclinic:
+    - version:      master
+      default:      true
+      archive:      spring-petclinic-master.tar.gz
+      archive_repo: $(repo_host)/app/spring-petclinic
+      path:         $(app_root)/spring-petclinic-master
+      war_path:     $(app_root)/spring-petclinic-master/petclinic.war
+
+  spring_mvc_31_demo:
+    - version:      master
+      default:      true
+      archive:      spring-mvc-31-demo-master.tar.gz
+      archive_repo: $(repo_host)/app/spring-mvc-31-demo
+      path:         $(app_root)/spring-mvc-31-demo-master
+      war_path:     $(app_root)/spring-mvc-31-demo-master/spring-mvc-31-demo.war
+
+  quartz_test:
+    - version:      master
+      default:      true
+      path:         $(test_apps_root)/java/quartz-test
+      war_path:     $(test_apps_root)/java/quartz-test/target/quartz-test.war
+
+  grails:
+    - version:      1.3.4
+      default:      true
+      archive:      grails-1.3.4.tar.gz
+      archive_repo: $(repo_host)/app/grails-1.3.4/
+      path:         $(app_root)/grails-1.3.4
+  
+    - version:      2.1.1
+      default:      true
+      archive:      grails-2.1.1.tar.gz
+      archive_repo: $(repo_host)/app/grails-2.1.1/
+      path:         $(app_root)/grails-2.1.1
+
+  grails1_app:
+    - version:      master
+      default:      true
+      path:         $(test_apps_root)/java/grails1-app/petclinic
+      grails_home:  $(app_root)/grails-1.3.4
+      war_path:     $(test_apps_root)/java/grails1-app/petclinic/target/petclinic-0.1.war
+
+  grails2_app:
+    - version:      master
+      default:      true
+      path:         $(test_apps_root)/java/grails2-app/petclinic
+      grails_home:  $(app_root)/grails-2.1.1
+      war_path:     $(test_apps_root)/java/grails2-app/petclinic/target/petclinic-0.1.war
+
+  hornetq:
+    - version:     2.3.0
+      archive:     hornetq-2.3.0.Final-bin.tar.gz
+      path:        $(app_root)/hornetq-2.3.0.Final
+      archive_repo:  $(repo_host)/app/hornetq
+      log_path:      logs
+      log_file:      hornetq-console.log
+      startup_msg:   'Server is now live'
+      shutdown_msg:   'Stopping HornetQ Server'
+      config_path: $(agent_integration_test_root)/conf/java/hornetq-jms.xml
+
+
+  activemq:
+    - version:     5.9.0
+      archive:     apache-activemq-5.9.0-bin.tar.gz
+      path:        $(app_root)/apache-activemq-5.9.0
+      archive_repo:  $(repo_host)/app/activemq
+      # Factor out defaults when adding second version
+      # <<:                  *activemq_defaults
+      # startup_args:        [ activemq.sh, start ] hard wired in jms.py
+      # shutdown_args:       [ activemq.sh, stop  ] hard wired in jms.py
+      log_path:      data
+      log_file:      activemq.log
+      startup_msg:   'started | org.apache.activemq.broker.BrokerService | main'
+      shutdown_msg:   'shutdown | org.apache.activemq.broker.BrokerService'
+
+      
+  collector:
+    - version: 10
+      host:    localhost
+      port:    10101

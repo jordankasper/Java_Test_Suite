@@ -1,0 +1,19 @@
+# variables that will be expanded in the java_config.yml file
+
+var:
+  os:        linux # set to osx to avoid downloading the jdks
+  repo_host: 172.16.2.236
+  app_root:  /Users/shr/apps
+  test_apps_root: /Users/.../java_agent/agent-integration-tests/testapps
+  java_root: /Users/.../testApps
+  agent_integration_test_root: /Users/.../java_agent/agent-integration-tests
+  java_agent_dev_root: /Users/.../java_agent
+
+# override attributes (if necessary) in java_config.yml
+#
+# override:
+#   java.version=5.default: false
+#   java.version=6.default: false
+#   java.version=7.path: /Library/Java/JavaVirtualMachines/jdk1.7.0_07.jdk/Contents/Home
+
+override:

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: newrelic-api-2.15.0.jar spring-web-3.2.1.RELEASE.jar sprin
+ g-aop-3.2.1.RELEASE.jar aopalliance-1.0.jar spring-beans-3.2.1.RELEAS
+ E.jar spring-core-3.2.1.RELEASE.jar commons-logging-1.1.1.jar spring-
+ context-3.2.1.RELEASE.jar spring-expression-3.2.1.RELEASE.jar spring-
+ tx-3.2.1.RELEASE.jar spring-context-support-3.2.1.RELEASE.jar quartz-
+ 2.1.6.jar c3p0-0.9.1.1.jar slf4j-api-1.6.1.jar
+

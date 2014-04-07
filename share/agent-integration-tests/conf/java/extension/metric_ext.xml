@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urn:extension xmlns:urn="newrelic-extension"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="newrelic-extension extension.xsd " name="metricExtension">
+        <urn:instrumentation>
+                <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.SleepSecServlet</urn:className>
+                        <urn:method>
+                                <urn:name>doWork</urn:name>
+                        </urn:method>
+                </urn:pointcut> 
+               <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.OneMethodInstrumentedServlet</urn:className>
+                        <urn:method>
+                                <urn:name>doWork</urn:name>
+                        </urn:method>
+                </urn:pointcut>
+                <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.TwoMethodsInstrumentedServlet</urn:className>
+                        <urn:method>
+                                <urn:name>sumEveryInteger</urn:name>
+                                <urn:parameters>
+                                    <urn:type>java.lang.String</urn:type>
+                                </urn:parameters>
+                        </urn:method>
+                        <urn:method>
+                                <urn:name>getUID</urn:name>
+                        </urn:method>
+                </urn:pointcut>
+                <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.OneThreadServlet$Worker</urn:className>
+                        <urn:method>
+                                <urn:name>run</urn:name>
+                        </urn:method>
+                </urn:pointcut>
+                <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.MultipleThreadsServlet$Worker</urn:className>
+                        <urn:method>
+                                <urn:name>run</urn:name>
+                        </urn:method>
+                </urn:pointcut>
+                <urn:pointcut transactionStartPoint="true">
+                        <urn:className>com.nr.test.servlet.FutureServlet$Calculations</urn:className>
+                        <urn:method>
+                                <urn:name>call</urn:name>
+                                <urn:parameters>
+                                </urn:parameters>
+                        </urn:method>
+                </urn:pointcut>
+        </urn:instrumentation>
+</urn:extension>

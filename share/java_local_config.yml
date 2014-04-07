@@ -1,0 +1,16 @@
+# variables that will be expanded in the java_config.yml file
+
+var:
+  os:        linux # set to osx to avoid downloading the jdks
+  repo_host: 172.16.2.236
+  app_root:  /home/jenkins/apps
+  test_apps_root: /home/jenkins/java_agent/agent-integration-tests/testapps
+  agent_integration_test_root: /home/jenkins/java_agent/agent-integration-tests
+
+# override attributes (if necessary) in java_config.yml
+
+override:
+  java_agent.version=master.jar_path: /deploy_scripts/agent_under_test/newrelic.jar
+#   java.version=5.default: false
+#   java.version=6.default: false
+#   java.version=7.path: /Library/Java/JavaVirtualMachines/jdk1.7.0_07.jdk/Contents/Home
